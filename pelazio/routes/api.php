@@ -31,7 +31,8 @@ Route::group(['prefix' => 'products'], function () {
     });
 });
 
-Route::group(['prefix' => 'carts'], function () {
+Route::group(['prefix' => 'cart'], function () {
+    Route::get('/',[CartController::class,'getUserCart']);
     Route::post('add-to-cart',[CartController::class,'addToCart']);
     Route::post('change-cart-item-count',[CartController::class,'changeCartItemCount']);
 });
