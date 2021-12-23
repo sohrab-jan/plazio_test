@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\Carts\AddToCartRequest;
 use App\Http\Requests\Carts\ChangeCartItemCountRequest;
 use App\Http\Resources\CartItemResource;
+use App\Http\Resources\CartResource;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -62,5 +63,22 @@ class CartController extends Controller
         $cartItemResource = new CartItemResource($cartItem);
 
         return $this->successResponse($cartItemResource);
+    }
+
+    /**
+     * @return JsonResponse
+     */
+    public function getUserCart(): JsonResponse
+    {
+        $userId  = User::first()->id ?? 1;
+        $cart = Cart::with('cartItems')->whereUserId($userId)->first();
+
+        if (!isset($cart)){
+            return $this->errorResponse(__('errors.cart_not_found'));
+        }
+
+        $cartResource = new CartResource($cart);
+
+        return $this->successResponse($cartResource);
     }
 }
