@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\Carts\AddToCartRequest;
+use App\Http\Requests\Carts\ChangeCartItemCountRequest;
+use App\Http\Resources\CartItemResource;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
@@ -15,6 +17,7 @@ class CartController extends Controller
     use ApiResponder;
 
     /**
+     * @param  AddToCartRequest  $request
      * @return JsonResponse
      */
     public function addToCart(AddToCartRequest $request): JsonResponse
@@ -41,9 +44,23 @@ class CartController extends Controller
             'cart_id'    => $cart->id,
             'quantity'   => $quantity
         ]);
+        $cartItemResource = new CartItemResource($cartItem);
 
-        //todo add cartResource
+        return $this->successResponse($cartItemResource);
+    }
 
-        return $this->successResponse([$cart,$cartItem]);
+    /**
+     * @param  ChangeCartItemCountRequest  $request
+     * @return JsonResponse
+     */
+    public function changeCartItemCount(ChangeCartItemCountRequest $request): JsonResponse
+    {
+        $cartItem = CartItem::with('product')->findOrFail($request->cart_item_id);
+        $cartItem->update([
+            'quantity' => $request->quantity
+        ]);
+        $cartItemResource = new CartItemResource($cartItem);
+
+        return $this->successResponse($cartItemResource);
     }
 }
